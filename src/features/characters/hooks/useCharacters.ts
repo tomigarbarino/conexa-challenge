@@ -1,44 +1,20 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import axiosInstance from '@/lib/axios';
 import { ApiResponseSchema } from '@/schemas/character';
+import { fetchCharacters, getCharactersQueryKey } from '../api/fetchCharacters';
 
 interface UseCharactersParams {
   name?: string;
   page?: number;
 }
 
-export function useCharacters({ name, page = 1 }: UseCharactersParams = {}) {
-  const trimmedName = name?.trim();
-  
+export function useCharacters({ name = '', page = 1 }: UseCharactersParams = {}) {
   return useQuery({
-    queryKey: ['characters', { name: trimmedName || '', page }],
-    queryFn: async () => {
-      const params: Record<string, any> = { page };
-      if (trimmedName) {
-        params.name = trimmedName;
-      }
-
-      try {
-        const response = await axiosInstance.get('/character', { params });
-        return ApiResponseSchema.parse(response.data);
-      } catch (error: any) {
-        // La API de Rick and Morty retorna 404 cuando no hay resultados
-        if (error.response?.status === 404) {
-          return {
-            info: {
-              count: 0,
-              pages: 0,
-              next: null,
-              prev: null,
-            },
-            results: [],
-          };
-        }
-        throw error;
-      }
-    },
-    retry: false, // No reintentar en 404
-    staleTime: 1000 * 60 * 10, // 10 minutos
+    queryKey: getCharactersQueryKey({ name, page }),
+    queryFn: () => fetchCharacters({ name, page }),
+    retry: false,
+    staleTime: 1000 * 60 * 10,
+    placeholderData: keepPreviousData,
   });
 }
 
