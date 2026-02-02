@@ -5,13 +5,10 @@ const axiosInstance = axios.create({
   timeout: 10000,
 });
 
-// Interceptors opcionales para manejo global de errores
+// Interceptor - Solo rechaza sin loguear (el manejo se hace en hooks)
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
-    console.error('API Error:', error);
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 export default axiosInstance;
