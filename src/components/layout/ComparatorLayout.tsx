@@ -6,8 +6,11 @@ import { Plus } from 'lucide-react';
 import { Header } from './Header';
 import { CharacterPanel } from '@/features/characters/components/CharacterPanel';
 import { EpisodeList } from '@/features/episodes/components/EpisodeList';
+import { useEpisodeComparison } from '@/features/episodes/hooks/useEpisodeComparison';
 
 export function ComparatorLayout() {
+  const { columns, isLoading } = useEpisodeComparison();
+
   return (
     <div className="h-screen max-h-screen flex flex-col overflow-hidden bg-background">
       {/* Header fijo */}
@@ -41,25 +44,40 @@ export function ComparatorLayout() {
 
         {/* Bottom Section - Episodes/Results (40%) */}
         <div className="flex-[0.4] flex overflow-hidden">
-          {/* Episode 1 */}
+          {/* Only Character A */}
           <div className="flex-1 overflow-hidden border-r">
-            <EpisodeList />
+            <EpisodeList 
+              title="Solo Personaje 1"
+              episodes={columns.left}
+              isLoading={isLoading}
+              emptyMessage="Selecciona el personaje 1"
+            />
           </div>
 
           {/* Separator vertical */}
           <Separator orientation="vertical" className="h-full" />
 
-          {/* Episode 2 */}
+          {/* Shared Episodes */}
           <div className="flex-1 overflow-hidden border-r">
-            <EpisodeList />
+            <EpisodeList 
+              title="Episodios Compartidos"
+              episodes={columns.middle}
+              isLoading={isLoading}
+              emptyMessage="Selecciona ambos personajes"
+            />
           </div>
 
           {/* Separator vertical */}
           <Separator orientation="vertical" className="h-full" />
 
-          {/* Comparison Result */}
+          {/* Only Character B */}
           <div className="flex-1 overflow-hidden">
-            <EpisodeList />
+            <EpisodeList 
+              title="Solo Personaje 2"
+              episodes={columns.right}
+              isLoading={isLoading}
+              emptyMessage="Selecciona el personaje 2"
+            />
           </div>
         </div>
       </div>
