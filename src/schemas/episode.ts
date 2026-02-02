@@ -10,4 +10,9 @@ export const EpisodeSchema = z.object({
   created: z.string(),
 });
 
+export const EpisodesResponseSchema = z.preprocess(
+  (data) => (Array.isArray(data) ? data : [data]),
+  z.array(EpisodeSchema)
+);
+
 export type Episode = z.infer<typeof EpisodeSchema>;

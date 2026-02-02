@@ -5,7 +5,6 @@ const axiosInstance = axios.create({
   timeout: 10000,
 });
 
-// Interceptor - Solo rechaza sin loguear (el manejo se hace en hooks)
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => Promise.reject(error)
