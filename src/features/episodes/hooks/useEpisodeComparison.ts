@@ -34,8 +34,9 @@ interface UseEpisodeComparisonResult {
 /**
  * Hook optimizado que hace UN SOLO request para todos los episodios
  * y calcula las diferencias/intersecciones en memoria
+ * @param compareKey - Número para trigger manual (null = no comparar)
  */
-export function useEpisodeComparison(): UseEpisodeComparisonResult {
+export function useEpisodeComparison(compareKey: number | null = null): UseEpisodeComparisonResult {
   const selectedCharA = useComparisonStore(state => state.selectedCharA);
   const selectedCharB = useComparisonStore(state => state.selectedCharB);
 
@@ -60,9 +61,9 @@ export function useEpisodeComparison(): UseEpisodeComparisonResult {
     onlyB: difference(idsB, idsA),
   }), [idsA, idsB]);
 
-  // Fetch bulk de episodios (UN SOLO REQUEST)
+  // Fetch bulk de episodios (UN SOLO REQUEST) - Solo cuando compareKey no es null
   const { data: episodes, isLoading, error } = useQuery({
-    queryKey: ['episodes-bulk', allUniqueIds.sort().join(',')],
+    queryKey: ['episodes-bulk', allUniqueIds.sort().join(','), compareKey],
     queryFn: async () => {
       if (allUniqueIds.length === 0) return [];
 
@@ -76,7 +77,7 @@ export function useEpisodeComparison(): UseEpisodeComparisonResult {
       // Validar cada episodio con Zod
       return z.array(EpisodeSchema).parse(data);
     },
-    enabled: allUniqueIds.length > 0,
+    enabled: allUniqueIds.length > 0 && compareKey !== null, // Solo fetch cuando se presiona el botón
     staleTime: 1000 * 60 * 15, // 15 minutos
   });
 

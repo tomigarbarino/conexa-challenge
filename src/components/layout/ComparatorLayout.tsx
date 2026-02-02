@@ -1,15 +1,38 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Plus } from 'lucide-react';
+import { GitCompare } from 'lucide-react';
 import { Header } from './Header';
 import { CharacterPanel } from '@/features/characters/components/CharacterPanel';
 import { EpisodeList } from '@/features/episodes/components/EpisodeList';
 import { useEpisodeComparison } from '@/features/episodes/hooks/useEpisodeComparison';
+import { useComparisonStore } from '@/store/comparison.store';
 
 export function ComparatorLayout() {
-  const { columns, isLoading } = useEpisodeComparison();
+  const [compareKey, setCompareKey] = useState(0);
+  const selectedCharA = useComparisonStore(state => state.selectedCharA);
+  const selectedCharB = useComparisonStore(state => state.selectedCharB);
+  
+  const { columns, isLoading } = useEpisodeComparison(compareKey > 0 ? compareKey : null);
+
+  const handleCompare = () => {
+    if (selectedCharA && selectedCharB) {
+      // Incrementar key para trigger nueva comparación
+      setCompareKey(prev => prev + 1);
+    }
+  };
+
+  const canCompare = selectedCharA && selectedCharB;
+
+  // Determinar el texto del botón según el estado
+  const getButtonText = () => {
+    if (!selectedCharA && !selectedCharB) return 'Selecciona dos personajes';
+    if (!selectedCharA) return 'Selecciona Personaje 1';
+    if (!selectedCharB) return 'Selecciona Personaje 2';
+    return 'Comparar Episodios';
+  };
 
   return (
     <div className="h-screen max-h-screen flex flex-col overflow-hidden bg-background">
@@ -25,21 +48,29 @@ export function ComparatorLayout() {
             <CharacterPanel position="left" />
           </div>
 
-          {/* Separator vertical */}
-          <Separator orientation="vertical" className="h-full" />
+          {/* Separator vertical con botón flotante */}
+          <div className="relative flex items-start justify-center">
+            <Separator orientation="vertical" className="h-full" />
+            
+            {/* Botón de comparación - en el top */}
+            <div className="absolute top-1 left-1/2 -translate-x-1/2 z-20">
+              <Button
+                onClick={handleCompare}
+                disabled={!canCompare || isLoading}
+                variant={canCompare ? 'default' : 'secondary'}
+                size="icon"
+                className="rounded-full shadow-xl h-14 w-14 disabled:opacity-100"
+                title={!canCompare ? getButtonText() : 'Comparar episodios'}
+              >
+                <GitCompare className="h-6 w-6" />
+              </Button>
+            </div>
+          </div>
 
           {/* Right Character Panel */}
           <div className="flex-1 overflow-hidden">
             <CharacterPanel position="right" />
           </div>
-
-          {/* Botón flotante PLUS - centrado entre los headers */}
-          <Button
-            size="icon"
-            className="rounded-full absolute left-1/2 -translate-x-1/2 top-7 z-20 shadow-xl h-14 w-14 bg-primary hover:bg-primary/90"
-          >
-            <Plus className="h-6 w-6" />
-          </Button>
         </div>
 
         {/* Bottom Section - Episodes/Results (40%) */}

@@ -44,8 +44,15 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="p-4 pb-2 flex-shrink-0 border-b">
+        <h2 className={`text-lg font-semibold ${isLeft ? 'text-left' : 'text-right'}`}>
+          {isLeft ? 'Personaje 1' : 'Personaje 2'}
+        </h2>
+      </div>
+
       {/* Search Input */}
-      <div className="p-4 border-b flex-shrink-0">
+      <div className="p-4 pt-3 border-b flex-shrink-0">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -85,13 +92,7 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
 
       {/* Characters Grid */}
       <ScrollArea className="flex-1 overflow-hidden">
-        <div className="p-4">
-          {/* Header */}
-          <h2 className={`text-lg font-semibold sticky top-0 bg-background/95 py-2 mb-4 ${isLeft ? 'text-left' : 'text-right'}`}>
-            {isLeft ? 'Personaje 1' : 'Personaje 2'}
-          </h2>
-
-          {/* Loading State */}
+        <div className="p-4">{/* Loading State */}
           {isLoading && (
             <div className="grid grid-cols-2 gap-3">
               {Array.from({ length: 4 }).map((_, i) => (
@@ -118,7 +119,7 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Search className="h-12 w-12 text-muted-foreground/30 mb-4" />
               <p className="text-muted-foreground font-medium">
-                No encontramos "{searchQuery}"
+                No encontramos &quot;{searchQuery}&quot;
               </p>
               <p className="text-xs text-muted-foreground/70 mt-1">
                 Intenta con otro nombre
