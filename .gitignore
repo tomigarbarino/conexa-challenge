@@ -40,8 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-# project specific
-INTERNAL_DEFENSE.md
+
+# private notes
+*.private.md
 *.local
-docs/
-prompt_plan.md
+.notes/
