@@ -71,7 +71,7 @@ export function ComparatorLayout() {
               title="Descargar resultados como CSV"
             >
               <Download className="h-3 w-3 mr-1" />
-              Export CSV
+              Exportar CSV
             </Button>
           </div>
           
