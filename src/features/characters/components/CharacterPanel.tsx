@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { X, Search, Loader2, ChevronDown } from 'lucide-react';
-import { useCharacters } from '@/features/characters/hooks/useCharacters';
+import { useInfiniteCharacters } from '@/features/characters/hooks/useInfiniteCharacters';
 import { useComparisonStore } from '@/store/comparison.store';
 import { useDebounce } from '@/hooks/use-debounce';
 import { Character } from '@/schemas/character';
@@ -21,14 +21,21 @@ interface CharacterPanelProps {
 export function CharacterPanel({ position }: CharacterPanelProps) {
   const isLeft = position === 'left';
   const [searchQuery, setSearchQuery] = useState('');
+  const loadMoreRef = useRef<HTMLDivElement>(null);
   
   const debouncedSearch = useDebounce(searchQuery, 400);
   
-  const { data, isLoading, isFetching, error } = useCharacters({ 
-    name: debouncedSearch || undefined 
-  });
+  const { 
+    data, 
+    isLoading, 
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    error 
+  } = useInfiniteCharacters({ name: debouncedSearch });
   
-  const isSearching = searchQuery !== debouncedSearch || isFetching;
+  const isSearching = searchQuery !== debouncedSearch || (isFetching && !isFetchingNextPage);
 
   const selectedChar = useComparisonStore(
     (state) => (isLeft ? state.selectedCharA : state.selectedCharB)
@@ -37,7 +44,29 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
     (state) => (isLeft ? state.setSelectedCharA : state.setSelectedCharB)
   );
 
-  const characters = data?.results || [];
+  const characters = data?.pages.flatMap(page => page.results) || [];
+  const totalCount = data?.pages[0]?.info.count || 0;
+
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const [entry] = entries;
+    if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    const element = loadMoreRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(handleObserver, {
+      root: null,
+      rootMargin: '100px',
+      threshold: 0,
+    });
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [handleObserver]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -86,13 +115,13 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
             {debouncedSearch ? (
               <>
                 {characters.length === 0 ? (
-                  <span>No hay resultados para &quot;{debouncedSearch}&quot;</span>
+                  <span>Sin resultados para &quot;{debouncedSearch}&quot;</span>
                 ) : (
-                  <span>{characters.length} resultado{characters.length !== 1 ? 's' : ''} encontrado{characters.length !== 1 ? 's' : ''}</span>
+                  <span>{characters.length} de {totalCount} personajes</span>
                 )}
               </>
             ) : (
-              <span>Mostrando los primeros resultados</span>
+              <span>{characters.length} de {totalCount} personajes</span>
             )}
           </p>
         )}
@@ -117,7 +146,7 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
 
           {error && (
             <div className="p-3 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-md text-sm">
-              Error cargando personajes
+              Error al cargar personajes
             </div>
           )}
 
@@ -125,10 +154,10 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Search className="h-12 w-12 text-muted-foreground/30 mb-4" />
               <p className="text-muted-foreground font-medium">
-                No encontramos &quot;{debouncedSearch}&quot;
+                Sin resultados para &quot;{debouncedSearch}&quot;
               </p>
               <p className="text-xs text-muted-foreground/70 mt-1">
-                Intenta con otro nombre
+                Probá con otro nombre
               </p>
             </div>
           )}
@@ -140,7 +169,7 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
                 No hay personajes disponibles
               </p>
               <p className="text-xs text-muted-foreground/70 mt-1">
-                Intenta buscando por nombre
+                Intentá buscando por nombre
               </p>
             </div>
           )}
@@ -185,15 +214,26 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
               </Card>
             ))}
           </div>
+
+          {/* Infinite scroll trigger */}
+          <div ref={loadMoreRef} className="h-10 flex items-center justify-center mt-4">
+            {isFetchingNextPage && (
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            )}
+            {!hasNextPage && characters.length > 0 && (
+              <p className="text-xs text-muted-foreground">Todos los personajes cargados</p>
+            )}
+          </div>
           </div>
         </ScrollArea>
         
-        {characters.length > 4 && !isLoading && (
+        {/* Scroll indicator */}
+        {hasNextPage && !isLoading && characters.length > 4 && (
           <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center pointer-events-none">
             <div className="h-12 w-full bg-gradient-to-t from-background via-background/80 to-transparent" />
-            <div className="absolute bottom-2 bg-black text-white rounded-full px-3 py-1 flex items-center gap-1 text-xs shadow-md">
+            <div className="absolute bottom-2 bg-black/80 text-white rounded-full px-3 py-1 flex items-center gap-1 text-xs shadow-md animate-bounce">
               <ChevronDown className="h-3 w-3" />
-              <span>Scroll</span>
+              <span>Scroll para más</span>
             </div>
           </div>
         )}
