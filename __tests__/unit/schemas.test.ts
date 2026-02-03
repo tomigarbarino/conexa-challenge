@@ -20,8 +20,15 @@ describe('Zod Schemas', () => {
     });
 
     it('should fail on missing id', () => {
-      const { id: _id, ...invalid } = validEpisode;
-      const result = EpisodeSchema.safeParse(invalid);
+      const episodeWithoutId = {
+        name: validEpisode.name,
+        air_date: validEpisode.air_date,
+        episode: validEpisode.episode,
+        characters: validEpisode.characters,
+        url: validEpisode.url,
+        created: validEpisode.created,
+      };
+      const result = EpisodeSchema.safeParse(episodeWithoutId);
       expect(result.success).toBe(false);
     });
 
