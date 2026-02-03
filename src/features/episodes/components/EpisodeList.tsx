@@ -26,10 +26,10 @@ export function EpisodeList({
   return (
     <div className="relative h-full w-full">
       <ScrollArea className="h-full w-full">
-        <div className="p-4">
-          <div className="sticky top-0 bg-background/95 backdrop-blur-sm py-3 border-b mb-4 z-10">
-            <h3 className="text-sm font-bold">{title}</h3>
-            <p className="text-xs text-muted-foreground mt-1">
+        <div className="p-3 sm:p-4">
+          <div className="sticky top-0 bg-background/95 backdrop-blur-sm py-2 sm:py-3 border-b mb-3 sm:mb-4 z-10">
+            <h3 className="text-xs sm:text-sm font-bold">{title}</h3>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
               {isLoading ? (
                 <span className="inline-flex items-center gap-1">
                   <span className="animate-pulse">●</span> Cargando...
@@ -54,32 +54,32 @@ export function EpisodeList({
         )}
 
         {!isLoading && episodes.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-center px-4">
-            {emptyIcon || <Film className="h-12 w-12 text-muted-foreground/30 mb-3" />}
-            <p className="text-sm text-muted-foreground font-medium">
+          <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center px-3 sm:px-4">
+            {emptyIcon || <Film className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground/30 mb-2 sm:mb-3" />}
+            <p className="text-xs sm:text-sm text-muted-foreground font-medium">
               {emptyMessage}
             </p>
           </div>
         )}
 
         {!isLoading && episodes.length > 0 && (
-          <div className="space-y-1">
+          <div className="space-y-0.5 sm:space-y-1">
             {episodes.map((episode) => (
               <div
                 key={episode.id}
-                className="group p-3 border-b last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer"
+                className="group p-2 sm:p-3 border-b last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer"
               >
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start justify-between gap-2 sm:gap-3">
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm leading-tight mb-1 group-hover:text-primary transition-colors truncate" title={episode.name}>
+                    <h4 className="font-medium text-xs sm:text-sm leading-tight mb-0.5 sm:mb-1 group-hover:text-primary transition-colors truncate" title={episode.name}>
                       {episode.name}
                     </h4>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Calendar className="h-3 w-3" />
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-muted-foreground">
+                      <Calendar className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       <span>{episode.air_date}</span>
                     </div>
                   </div>
-                  <Badge variant="outline" className="text-xs font-mono flex-shrink-0">
+                  <Badge variant="outline" className="text-[10px] sm:text-xs font-mono flex-shrink-0">
                     {episode.episode}
                   </Badge>
                 </div>

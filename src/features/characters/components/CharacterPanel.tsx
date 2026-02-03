@@ -81,13 +81,13 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
-      <div className="p-4 pb-2 flex-shrink-0 border-b">
-        <h2 className={`text-lg font-semibold ${isLeft ? 'text-left' : 'text-right'}`}>
+      <div className="p-3 sm:p-4 pb-2 flex-shrink-0 border-b">
+        <h2 className={`text-base sm:text-lg font-semibold ${isLeft ? 'text-left' : 'text-right'}`}>
           {isLeft ? 'Personaje 1' : 'Personaje 2'}
         </h2>
       </div>
 
-      <div className="p-4 pt-3 border-b flex-shrink-0">
+      <div className="p-3 sm:p-4 pt-2 sm:pt-3 border-b flex-shrink-0">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -129,15 +129,15 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
 
       <div className="flex-1 relative overflow-hidden">
         <ScrollArea className="h-full">
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
           {isLoading && (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 sm:gap-3">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i} className="p-3">
+                <Card key={i} className="p-2 sm:p-3">
                   <div className="space-y-2">
-                    <Skeleton className="h-20 w-full rounded" />
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
+                    <Skeleton className="h-16 sm:h-20 w-full rounded" />
+                    <Skeleton className="h-3 sm:h-4 w-3/4" />
+                    <Skeleton className="h-2 sm:h-3 w-1/2" />
                   </div>
                 </Card>
               ))}
@@ -174,7 +174,7 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {characters.map((character: Character) => (
               <Card
                 key={character.id}
@@ -190,7 +190,7 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
                     : 'hover:shadow-lg'
                 }`}
               >
-                <div className="relative h-32 overflow-hidden bg-muted flex items-center justify-center">
+                <div className="relative h-24 sm:h-32 overflow-hidden bg-muted flex items-center justify-center">
                   <Image
                     src={character.image}
                     alt={character.name}
@@ -199,14 +199,14 @@ export function CharacterPanel({ position }: CharacterPanelProps) {
                   />
                 </div>
 
-                <div className="p-3">
-                  <h3 className="font-bold text-sm truncate">{character.name}</h3>
-                  <p className="text-xs text-muted-foreground truncate mb-2">
+                <div className="p-2 sm:p-3">
+                  <h3 className="font-bold text-xs sm:text-sm truncate">{character.name}</h3>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate mb-1 sm:mb-2">
                     {character.species}
                   </p>
                   <Badge 
                     variant="outline" 
-                    className={`text-[0.65rem] font-medium ${getStatusColor(character.status)}`}
+                    className={`text-[0.6rem] sm:text-[0.65rem] font-medium ${getStatusColor(character.status)}`}
                   >
                     {character.status}
                   </Badge>
