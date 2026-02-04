@@ -15,7 +15,7 @@ Selecciona dos personajes de Rick & Morty y descubre qué episodios comparten, c
 
 ## 🚀 Live Demo
 
-👉 **[LINK_VERCEL_AQUI]**
+👉 **[https://conexa-challenge-one.vercel.app](https://conexa-challenge-one.vercel.app)**
 
 ---
 
